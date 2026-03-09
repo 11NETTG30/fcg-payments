@@ -1,4 +1,5 @@
 using API.Configurations;
+using Application.DependencyInjection;
 using DotNetEnv;
 using Infrastructure.DependencyInjection;
 
@@ -14,6 +15,10 @@ builder.Services.AddDb(builder.Configuration);
 builder.Services.AddDI(builder.Configuration);
 builder.Services.AddTelemetry(builder);
 builder.Services.AddLogsTelemetry(builder);
+
+builder.Services
+    .AddApplication()
+    .AddFluentValidationConfig();
 
 var app = builder.Build();
 

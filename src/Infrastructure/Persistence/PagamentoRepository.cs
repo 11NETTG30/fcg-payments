@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
 
-public class PedidoRepository : IPagamentoRepository
+public class PagamentoRepository : IPagamentoRepository
 {
     private readonly PagamentoDbContext _context;
 
-    public PedidoRepository(PagamentoDbContext context)
+    public PagamentoRepository(PagamentoDbContext context)
     {
         _context = context;
     }

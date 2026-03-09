@@ -1,9 +1,7 @@
-﻿using Application.Services;
-using Domain.Repositories;
+﻿using Domain.Repositories;
 using Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Application.Interfaces.Services;
 
 namespace Infrastructure.DependencyInjection;
 
@@ -14,11 +12,7 @@ public static class PagamentoDependencyInjection
         IConfiguration configuration)
     {
         #region Repository
-        services.AddScoped<IPagamentoRepository, PedidoRepository>();
-        #endregion
-
-        #region Service
-        services.AddScoped<IPagamentoService, PagamentoService>();
+        services.AddScoped<IPagamentoRepository, PagamentoRepository>();
         #endregion
 
         return services;
