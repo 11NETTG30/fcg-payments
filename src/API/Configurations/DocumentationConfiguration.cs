@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
-namespace FCG.API.Configurations;
+namespace API.Configurations;
 
 public static class DocumentationConfiguration
 {

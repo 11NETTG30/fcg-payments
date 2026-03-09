@@ -1,6 +1,5 @@
 ﻿using Application.DTOs;
 using Application.Interfaces.Services;
-using Domain.Enums;
 using Domain.Exceptions;
 using FCG.API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -60,10 +59,6 @@ public class PagamentoController : ControllerBase
             _logger.LogWarning(ex, "Erro de domínio ao processar pagamento do pedido {PedidoId}", request.PedidoId);
             return BadRequest(ApiResponse<object>.Failure(ex.Message));
         }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ApiResponse<object>.Failure(ex.Message));
-        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao processar pagamento do pedido {PedidoId}", request.PedidoId);
@@ -108,12 +103,12 @@ public class PagamentoController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
+            _logger.LogWarning(ex, "Erro de pagamento não encontrado {PagamentoId}", id);
             return NotFound(ApiResponse<object>.Failure(ex.Message));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao buscar pagamento {PagamentoId}", id);
-
             return StatusCode(500, ApiResponse<object>.Failure(
                 _erroInternoMsg
             ));
@@ -133,6 +128,7 @@ public class PagamentoController : ControllerBase
         try
         {
             var pagamentos = await _appService.ListarPagamentosPorUsuarioAsync(usuarioId);
+
             return Ok(ApiResponse<List<PagamentoDto>>.Success(pagamentos));
         }
         catch (DomainException ex)

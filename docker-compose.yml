@@ -1,4 +1,17 @@
 services:
+  payment-api:
+    build:
+      context: ./src
+      dockerfile: API/Dockerfile
+    container_name: payment-api
+    networks:
+      - fcg-network
+    env_file: 
+      - src/API/.env 
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+
   postgres:
     image: postgres:18.1
     container_name: fcg-postgres

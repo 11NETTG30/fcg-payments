@@ -62,6 +62,7 @@ cp .env.example .env
 ```bash
 # Inicia PostgreSQL e PgAdmin (obs: necessário instalar e abrir o Docker Desktop)
 docker-compose up -d
+docker-compose up --build -d
 
 # Verifica se subiu
 docker-compose ps
