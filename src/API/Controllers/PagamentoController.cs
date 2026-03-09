@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Application.Interfaces.Services;
+using Domain.Enums;
 using Domain.Exceptions;
 using FCG.API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -28,34 +29,35 @@ public class PagamentoController : ControllerBase
     /// Realiza o pagamento do pedido
     /// </summary>
     /// <param name="id">Id do pedido que será pago</param>
-    /// <param name="dto">Dados do pagamento do pedido</param>
+    /// <param name="request">Dados do pagamento do pedido</param>
     /// <returns>Confirmação do pagamento</returns>
-    [HttpPost("{id:guid}/pagamento")]
+    [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ApiResponse<Guid>>> Pagar([FromBody] PagamentoDto dto)
+    public async Task<ActionResult<ApiResponse<Guid>>> Pagar([FromBody] PagamentoRequest request)
     {
         try
         {
-            var pago = await _appService.ProcessarAsync(dto);
-
-            if (pago)
-                return CreatedAtAction(
-                    nameof(Obter),
-                    new { pago = pago },
-                    ApiResponse<bool>.Success(pago, "Pedido pago com sucesso")
-                );
+            var pagamento = await _appService.ProcessarAsync(request);
 
             return CreatedAtAction(
-                    nameof(Obter),
-                    new { pago = pago },
-                    ApiResponse<bool>.Failure("O pedido não foi pago.")
+                nameof(Pagar),
+                new { id = pagamento.Id },
+                ApiResponse<Guid>.Success(pagamento.Id, "Pedido pago com sucesso")
+            );
+        }
+        catch (PagamentoRecusadoException ex)
+        {
+            return CreatedAtAction(
+                    nameof(Pagar),
+                    new { id = ex.PagamentoId },
+                    ApiResponse<bool>.Failure($"O pagamento {ex.PagamentoId} foi recusado.")
                 );
         }
         catch (DomainException ex)
         {
-            _logger.LogWarning(ex, "Erro de domínio ao processar pagamento do pedido {PedidoId}", dto.PedidoId);
+            _logger.LogWarning(ex, "Erro de domínio ao processar pagamento do pedido {PedidoId}", request.PedidoId);
             return BadRequest(ApiResponse<object>.Failure(ex.Message));
         }
         catch (KeyNotFoundException ex)
@@ -64,7 +66,7 @@ public class PagamentoController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao processar pagamento do pedido {PedidoId}", dto.PedidoId);
+            _logger.LogError(ex, "Erro ao processar pagamento do pedido {PedidoId}", request.PedidoId);
             return StatusCode(500, ApiResponse<object>.Failure(
                 _erroInternoMsg
             ));

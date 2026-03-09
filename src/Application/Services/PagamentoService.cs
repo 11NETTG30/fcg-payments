@@ -30,7 +30,7 @@ public class PagamentoService : IPagamentoService
         return (PagamentoDto)pagamento;
     }
 
-    public async Task<bool> ProcessarAsync(PagamentoDto dadosPagamento)
+    public async Task<PagamentoEntity> ProcessarAsync(PagamentoRequest dadosPagamento)
     {
         await ChecarPagamentoDuplicado(dadosPagamento.PedidoId);
 
@@ -40,7 +40,10 @@ public class PagamentoService : IPagamentoService
 
         await SalvarPagamento(pagamento, pago);
 
-        return true;
+        if (pagamento.Status != PagamentoStatus.Pago)
+            throw new PagamentoRecusadoException(pagamento.Id);
+
+        return pagamento;
     }
 
     private async Task<PagamentoEntity> BuscarPagamento(Guid id)
@@ -61,7 +64,7 @@ public class PagamentoService : IPagamentoService
             throw new PedidoJaPagoException();
     }
 
-    private async Task<PagamentoEntity> CriarPedido(PagamentoDto dadosPagamento)
+    private async Task<PagamentoEntity> CriarPedido(PagamentoRequest dadosPagamento)
     {
         var pagamento = new PagamentoEntity(
             dadosPagamento.PedidoId,

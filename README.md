@@ -84,11 +84,11 @@ wsl dos2unix scripts/init-database.sh
 
 ### 4. Aplicar Migrations
 
-No console do Gerenciador de Pacotes, selecione o projeto padrão (ex: `src\FCG.Infrastructure`) e execute os comandos:
+No console do Gerenciador de Pacotes, selecione o projeto padrão (ex: `Infrastructure`) e execute os comandos:
 
 ```powershell
 # Criar uma nova migration
-Add-Migration InitialIdentidade -Context IdentidadeDbContext -OutputDir Identidade/Persistence/Migrations
+Add-Migration InitialMigration -Context PagamentoDbContext -OutputDir Persistence/Migrations
 
 # Aplicar as alterações no banco de dados
 Update-Database
@@ -106,7 +106,7 @@ Update-Database
 
 Rodar a API
 
-Acesse: https://localhost:5001/swagger
+Acesse: https://localhost:7058/swagger
 
 ## Dados do administrador para login:
 ```json
