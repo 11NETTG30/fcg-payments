@@ -63,7 +63,7 @@ namespace Domain.Entities
         private void ChecaPedidoJaPago()
         {
             if (Status == PagamentoStatus.Pago)
-                throw new PedidoJaPagoException();
+                throw new PagamentoJaPagoException();
         }
 
         private void ValidaSeStatusDiferenteCriado(string msg)
@@ -75,7 +75,7 @@ namespace Domain.Entities
         private void ValidarPodePagar()
         {
             if (Status == PagamentoStatus.Cancelado)
-                throw new PedidoCanceladoException();
+                throw new PagamentoCanceladoException();
 
             ChecaPedidoJaPago();
             ValidaSeStatusDiferenteCriado("Pagamento não pode ser aprovado neste estado.");

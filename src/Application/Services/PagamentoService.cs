@@ -61,7 +61,7 @@ public class PagamentoService : IPagamentoService
         var pagamentoExistente = await _pagamentoRepository.ObterPorPedidoAsync(pedidoId);
 
         if (pagamentoExistente is not null && pagamentoExistente.Status == PagamentoStatus.Pago)
-            throw new PedidoJaPagoException();
+            throw new PagamentoJaPagoException();
     }
 
     private async Task<PagamentoEntity> CriarPedido(PagamentoRequest dadosPagamento)
