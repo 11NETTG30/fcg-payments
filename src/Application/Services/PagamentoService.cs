@@ -1,4 +1,6 @@
 ﻿using Application.DTOs;
+using Application.Events;
+using Application.Interfaces.Messaging;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Enums;
@@ -10,10 +12,15 @@ namespace Application.Services;
 public class PagamentoService : IPagamentoService
 {
     private readonly IPagamentoRepository _pagamentoRepository;
+    private readonly IEventPublisher _publisher;
 
-    public PagamentoService(IPagamentoRepository pagamentoRepository)
+    public PagamentoService(
+        IPagamentoRepository pagamentoRepository,
+        IEventPublisher publisher
+        )
     {
         _pagamentoRepository = pagamentoRepository;
+        _publisher = publisher;
     }
 
     public async Task<List<PagamentoDto>> ListarPagamentosPorUsuarioAsync(Guid idUsuario)
@@ -34,14 +41,31 @@ public class PagamentoService : IPagamentoService
     {
         await ChecarPagamentoDuplicado(dadosPagamento.PedidoId);
 
-        var pagamento = await CriarPedido(dadosPagamento);
+        var pagamento = await GerarPagamento(dadosPagamento);
+
+        if (pagamento.Status != PagamentoStatus.Pago)
+            throw new PagamentoRecusadoException(pagamento.Id);
+
+        return pagamento;
+    }
+
+    public async Task ProcessarAsync(OrderPlacedEvent dadosPagamento)
+    {
+        var pagamento = await _pagamentoRepository.ObterPorPedidoAsync(dadosPagamento.OrderId);
+
+        if (pagamento is null)
+            pagamento = await GerarPagamento((PagamentoRequest)dadosPagamento);
+
+        await EnviarMensagemFila(pagamento);
+    }
+
+    private async Task<PagamentoEntity> GerarPagamento(PagamentoRequest dadosPagamento)
+    {
+        var pagamento = await CriarPagamento(dadosPagamento);
 
         var pago = ProcessarPagamento();
 
         await SalvarPagamento(pagamento, pago);
-
-        if (pagamento.Status != PagamentoStatus.Pago)
-            throw new PagamentoRecusadoException(pagamento.Id);
 
         return pagamento;
     }
@@ -64,7 +88,7 @@ public class PagamentoService : IPagamentoService
             throw new PagamentoJaPagoException();
     }
 
-    private async Task<PagamentoEntity> CriarPedido(PagamentoRequest dadosPagamento)
+    private async Task<PagamentoEntity> CriarPagamento(PagamentoRequest dadosPagamento)
     {
         var pagamento = new PagamentoEntity(
             dadosPagamento.PedidoId,
@@ -93,5 +117,16 @@ public class PagamentoService : IPagamentoService
 
         _pagamentoRepository.Atualizar(pagamento);
         await _pagamentoRepository.UnitOfWork.Commit();
+    }
+
+    private async Task EnviarMensagemFila(PagamentoEntity pagamento)
+    {
+        var message = new PaymentProcessedEvent
+        {
+            PaymentId = pagamento.Id,
+            PaymentStatus = pagamento.Status.ToString()
+        };
+
+        await _publisher.PublishAsync(message, "payment-processed");
     }
 }

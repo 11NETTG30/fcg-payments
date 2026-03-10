@@ -1,5 +1,11 @@
-﻿using Domain.Repositories;
-using Infrastructure.Persistence;
+﻿using Application.Interfaces.Interfaces.Repositories;
+using Application.Interfaces.Messaging;
+using Domain.Repositories;
+using Infrastructure.Messaging;
+using Infrastructure.Messaging.Consumers;
+using Infrastructure.Messaging.Publishers;
+using Infrastructure.Messaging.QueueSetup;
+using Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +19,15 @@ public static class PagamentoDependencyInjection
     {
         #region Repository
         services.AddScoped<IPagamentoRepository, PagamentoRepository>();
+        services.AddScoped<IProcessedEventRepository, ProcessedEventRepository>();
+        #endregion
+
+        #region Messageria
+        services.AddSingleton<RabbitMqConnection>();
+        services.AddScoped<IEventPublisher, RabbitMqPublisher>();
+
+        services.AddHostedService<RabbitMqTopologySetup>();
+        services.AddHostedService<OrderPlacedConsumer>();
         #endregion
 
         return services;

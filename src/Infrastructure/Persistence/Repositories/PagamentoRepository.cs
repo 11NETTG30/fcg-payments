@@ -4,7 +4,7 @@ using Domain.Repositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Persistence;
+namespace Infrastructure.Persistence.Repositories;
 
 public class PagamentoRepository : IPagamentoRepository
 {

@@ -9,9 +9,9 @@ public static class OpenTelemetryConfiguration
     {
         public void AddTelemetry(WebApplicationBuilder builder)
         {
-            if (builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] is null ||
-                builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"] is null ||
-                builder.Configuration["OTEL_SERVICE_NAME"] is null)
+            if (string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]) ||
+                string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"]) ||
+                string.IsNullOrWhiteSpace(builder.Configuration["OTEL_SERVICE_NAME"]))
                 return;
 
             services.AddOpenTelemetry()

@@ -1,5 +1,4 @@
 ﻿using OpenTelemetry.Logs;
-using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace API.Configurations;
@@ -10,8 +9,9 @@ public static class OpenTelemetryLogsConfiguration
     {
         public void AddLogsTelemetry(WebApplicationBuilder builder)
         {
-            if (builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] is null ||
-                builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"] is null)
+            if (string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]) ||
+                string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"]) ||
+                string.IsNullOrWhiteSpace(builder.Configuration["OTEL_SERVICE_NAME"]))
                 return;
 
             builder.Logging.ClearProviders();
