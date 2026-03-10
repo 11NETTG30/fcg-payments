@@ -116,3 +116,6 @@ Acesse: https://localhost:7058/swagger
 	"senha": "Admin@123"
 }
 ```
+
+## Para acessra página do RabbitMq:
+Acesse: http://localhost:15672/

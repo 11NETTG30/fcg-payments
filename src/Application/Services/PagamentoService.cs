@@ -123,6 +123,7 @@ public class PagamentoService : IPagamentoService
     {
         var message = new PaymentProcessedEvent
         {
+            OrderId = pagamento.PedidoId,
             PaymentId = pagamento.Id,
             PaymentStatus = pagamento.Status.ToString()
         };
