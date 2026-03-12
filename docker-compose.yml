@@ -10,7 +10,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
-      # - ./scripts:/docker-entrypoint-initdb.d
     networks:
       - fcg-network
     healthcheck:
@@ -45,8 +44,6 @@ services:
       - fcg-network
     env_file: 
       - src/API/.env
-    environment:
-      - MT_LICENSE=Community
     restart: unless-stopped
     ports:
       - "8080:8080"

@@ -79,6 +79,16 @@ docker exec -it fcg-postgres psql -U fcgadmin -d fcg_plataforma_jogos
 
 # Caso dê erro para subir o container postgres, rode o seguinte comando no terminal:
 wsl dos2unix scripts/init-database.sh
+
+# Buildar a imagem:
+Da pasta da solução:
+docker build -t ghcr.io/11nettg30/payment-api:latest -f src/API/Dockerfile src
+
+# Subir a imagem para o repositório do Github:
+docker login ghcr.io -u NOMEUSUARIO
+(e digitar o token obtido anteriormente na github)
+
+docker push ghcr.io/11nettg30/payment-api:latest
 ```
 
 ### 4. Aplicar Migrations
