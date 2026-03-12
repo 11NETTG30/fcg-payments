@@ -14,17 +14,12 @@ public class ProcessedEventRepository : IProcessedEventRepository
         _context = context;
     }
 
-    public async Task<bool> ExistsAsync(Guid orderId)
-    {
-        return await _context.ProcessedEvents
-            .AnyAsync(x => x.OrderId == orderId);
-    }
-
-    public async Task SaveAsync(Guid orderId)
+    public async Task SaveAsync(Guid userId, Guid gameId)
     {
         _context.ProcessedEvents.Add(new ProcessedEventEntity
         {
-            OrderId = orderId,
+            UserId = userId,
+            GameId = gameId,
             ProcessedAt = DateTime.UtcNow
         });
 

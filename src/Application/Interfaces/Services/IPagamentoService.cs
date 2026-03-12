@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Application.Events;
 using Domain.Entities;
 
 namespace Application.Interfaces.Services;

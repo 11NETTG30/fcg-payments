@@ -2,7 +2,5 @@
 
 public interface IProcessedEventRepository
 {
-    Task<bool> ExistsAsync(Guid orderId);
-
-    Task SaveAsync(Guid orderId);
+    Task SaveAsync(Guid userId, Guid gameId);
 }

@@ -10,7 +10,7 @@ public class ProcessedEventConfiguration : IEntityTypeConfiguration<ProcessedEve
     {
         builder.ToTable("processed_events");
 
-        builder.HasKey(x => x.OrderId);
+        builder.HasKey(x => new { x.UserId, x.GameId });
 
         builder.Property(x => x.ProcessedAt)
             .IsRequired();

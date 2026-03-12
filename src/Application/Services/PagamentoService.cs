@@ -1,26 +1,26 @@
 ﻿using Application.DTOs;
 using Application.Events;
-using Application.Interfaces.Messaging;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Repositories;
+using MassTransit;
 
 namespace Application.Services;
 
 public class PagamentoService : IPagamentoService
 {
     private readonly IPagamentoRepository _pagamentoRepository;
-    private readonly IEventPublisher _publisher;
+    private readonly IPublishEndpoint _publishEndpoint;
 
     public PagamentoService(
         IPagamentoRepository pagamentoRepository,
-        IEventPublisher publisher
+        IPublishEndpoint publishEndpoint
         )
     {
         _pagamentoRepository = pagamentoRepository;
-        _publisher = publisher;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async Task<List<PagamentoDto>> ListarPagamentosPorUsuarioAsync(Guid idUsuario)
@@ -39,7 +39,7 @@ public class PagamentoService : IPagamentoService
 
     public async Task<PagamentoEntity> ProcessarAsync(PagamentoRequest dadosPagamento)
     {
-        await ChecarPagamentoDuplicado(dadosPagamento.PedidoId);
+        await ChecarPagamentoDuplicado(dadosPagamento);
 
         var pagamento = await GerarPagamento(dadosPagamento);
 
@@ -51,12 +51,23 @@ public class PagamentoService : IPagamentoService
 
     public async Task ProcessarAsync(OrderPlacedEvent dadosPagamento)
     {
-        var pagamento = await _pagamentoRepository.ObterPorPedidoAsync(dadosPagamento.OrderId);
+        var pagamento = await BuscarPagamentoDuplicadoOrderPlaced(dadosPagamento);
 
         if (pagamento is null)
             pagamento = await GerarPagamento((PagamentoRequest)dadosPagamento);
 
         await EnviarMensagemFila(pagamento);
+    }
+
+    private async Task<PagamentoEntity?> BuscarPagamentoDuplicadoOrderPlaced(OrderPlacedEvent dadosPagamento)
+    {
+        var pagamento = new PagamentoEntity(
+            dadosPagamento.UserId,
+            dadosPagamento.GameId,
+            dadosPagamento.Price
+            );
+
+        return await _pagamentoRepository.ObterPorPedidoAsync(pagamento.PedidoId);
     }
 
     private async Task<PagamentoEntity> GerarPagamento(PagamentoRequest dadosPagamento)
@@ -80,9 +91,14 @@ public class PagamentoService : IPagamentoService
         return pagamento;
     }
 
-    private async Task ChecarPagamentoDuplicado(Guid pedidoId)
+    private async Task ChecarPagamentoDuplicado(PagamentoRequest pagamentoRequest)
     {
-        var pagamentoExistente = await _pagamentoRepository.ObterPorPedidoAsync(pedidoId);
+        var pagamento = new PagamentoEntity(
+            pagamentoRequest.UsuarioId,
+            pagamentoRequest.JogoId,
+            pagamentoRequest.Valor);
+
+        var pagamentoExistente = await _pagamentoRepository.ObterPorPedidoAsync(pagamento.PedidoId);
 
         if (pagamentoExistente is not null && pagamentoExistente.Status == PagamentoStatus.Pago)
             throw new PagamentoJaPagoException();
@@ -91,7 +107,6 @@ public class PagamentoService : IPagamentoService
     private async Task<PagamentoEntity> CriarPagamento(PagamentoRequest dadosPagamento)
     {
         var pagamento = new PagamentoEntity(
-            dadosPagamento.PedidoId,
             dadosPagamento.UsuarioId,
             dadosPagamento.JogoId,
             dadosPagamento.Valor
@@ -128,6 +143,6 @@ public class PagamentoService : IPagamentoService
             PaymentStatus = pagamento.Status.ToString()
         };
 
-        await _publisher.PublishAsync(message, "payment-processed");
+        await _publishEndpoint.Publish(message);
     }
 }

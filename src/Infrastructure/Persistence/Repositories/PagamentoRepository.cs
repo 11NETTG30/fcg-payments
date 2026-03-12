@@ -29,14 +29,14 @@ public class PagamentoRepository : IPagamentoRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public void Adicionar(PagamentoEntity pedido)
+    public void Adicionar(PagamentoEntity pagamento)
     {
-        _context.Pagamentos.Add(pedido);
+        _context.Pagamentos.Add(pagamento);
     }
 
-    public void Atualizar(PagamentoEntity pedido)
+    public void Atualizar(PagamentoEntity pagamento)
     {
-        _context.Pagamentos.Update(pedido);
+        _context.Pagamentos.Update(pagamento);
     }
 
     public async Task<List<PagamentoEntity>> ListarPagamentosPorUsuarioAsync(Guid idUsuario)

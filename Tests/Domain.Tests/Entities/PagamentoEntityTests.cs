@@ -11,7 +11,6 @@ public class PagamentoEntityTests
         return new PagamentoEntity(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                Guid.NewGuid(),
                 100);
     }
 
@@ -71,7 +70,6 @@ public class PagamentoEntityTests
             new PagamentoEntity(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                Guid.NewGuid(),
                 0)
             );
 
@@ -83,7 +81,6 @@ public class PagamentoEntityTests
     {
         var exception = Assert.Throws<DomainException>(() =>
             new PagamentoEntity(
-                Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 -100)

@@ -7,9 +7,6 @@ public sealed class PagamentoRequestValidator : AbstractValidator<PagamentoReque
 {
     public PagamentoRequestValidator()
     {
-        RuleFor(request => request.PedidoId)
-            .NotEmpty();
-
         RuleFor(request => request.JogoId)
             .NotEmpty();
 

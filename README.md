@@ -32,10 +32,8 @@ Os principais objetivos deste projeto são:
 | Banco de Dados           | PostgreSQL                                                          |
 | Documentação API         | OpenAPI                                                             |
 | Documentação API (UI)    | Swagger e Scalar                                                    |
-| Monitoramento            | New Relic (.NET Agent)                                              |
+| Monitoramento            | New Relic (OpenTelemetry)                                           |
 | Testes Unitários         | xUnit                                                               |
-| Testes de Mutação        | Stryker.NET                                                         |
-| BDD                      | Reqnroll, NUnit, Moq                                                |
 
 ## 🚀 Setup Inicial
 

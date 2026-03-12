@@ -1,6 +1,8 @@
 ﻿using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Interfaces;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Domain.Entities
 {
@@ -14,11 +16,11 @@ namespace Domain.Entities
         public DateTime DataCriacao { get; private set; }
         public DateTime? DataPagamento { get; private set; }
 
-        public PagamentoEntity(Guid pedidoId, Guid usuarioId, Guid jogoId, decimal valor)
+        public PagamentoEntity(Guid usuarioId, Guid jogoId, decimal valor)
         {
             ValidarValor(valor);
 
-            PedidoId = pedidoId;
+            PedidoId = GerarPedidoId(usuarioId, jogoId);
             UsuarioId = usuarioId;
             JogoId = jogoId;
             DataCriacao = DateTime.UtcNow;
@@ -81,6 +83,16 @@ namespace Domain.Entities
             ValidaSeStatusDiferenteCriado("Pagamento não pode ser aprovado neste estado.");
         }
         #endregion
+
+        public static Guid GerarPedidoId(Guid usuarioId, Guid jogoId)
+        {
+            var input = $"{usuarioId}:{jogoId}";
+
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            return new Guid(hash);
+        }
 
         public bool EstaPago() => Status == PagamentoStatus.Pago;
 

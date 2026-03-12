@@ -56,12 +56,12 @@ public class PagamentoController : ControllerBase
         }
         catch (DomainException ex)
         {
-            _logger.LogWarning(ex, "Erro de domínio ao processar pagamento do pedido {PedidoId}", request.PedidoId);
+            _logger.LogWarning(ex, "Erro de domínio ao processar pagamento do usuario: {UsuarioId}, jogo: {JogoId}", request.UsuarioId, request.JogoId);
             return BadRequest(ApiResponse<object>.Failure(ex.Message));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao processar pagamento do pedido {PedidoId}", request.PedidoId);
+            _logger.LogError(ex, "Erro ao processar pagamento do usuario: {UsuarioId}, jogo: {JogoId}", request.UsuarioId, request.JogoId);
             return StatusCode(500, ApiResponse<object>.Failure(
                 _erroInternoMsg
             ));

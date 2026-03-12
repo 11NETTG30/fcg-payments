@@ -1,8 +1,9 @@
-﻿namespace Application.DTOs;
+﻿using Application.Events;
+
+namespace Application.DTOs;
 
 public class PagamentoRequest
 {
-    public Guid PedidoId { get; set; }
     public Guid UsuarioId { get; set; }
     public Guid JogoId { get; set; }
     public decimal Valor { get; set; }
@@ -11,7 +12,6 @@ public class PagamentoRequest
     {
         return new PagamentoRequest
         {
-            PedidoId = evento.OrderId,
             UsuarioId = evento.UserId,
             JogoId = evento.GameId,
             Valor = evento.Price

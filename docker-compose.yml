@@ -36,23 +36,23 @@ services:
       timeout: 5s
       retries: 10
 
-  payment-api:
-    build:
-      context: ./src
-      dockerfile: API/Dockerfile
-    container_name: payment-api
-    networks:
-      - fcg-network
-    env_file: 
-      - src/API/.env 
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    depends_on: 
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
+  # payment-api:
+  #   build:
+  #     context: ./src
+  #     dockerfile: API/Dockerfile
+  #   container_name: payment-api
+  #   networks:
+  #     - fcg-network
+  #   env_file: 
+  #     - src/API/.env 
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on: 
+  #     postgres:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
 
 volumes:
   postgres_data:

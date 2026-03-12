@@ -1,12 +1,11 @@
 ﻿using Application.DTOs;
 using Application.Events;
 using Application.Interfaces;
-using Application.Interfaces.Interfaces.Repositories;
-using Application.Interfaces.Messaging;
 using Application.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Repositories;
+using MassTransit;
 using Moq;
 
 namespace Tests.Domain.Tests.Application;
@@ -15,14 +14,14 @@ public class PagamentoServiceTests
 {
     private readonly Mock<IPagamentoRepository> _pagamentoRepoMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IEventPublisher> _eventPublisherMock;
+    private readonly Mock<IPublishEndpoint> _eventPublisherMock;
     private readonly PagamentoService _service;
 
     public PagamentoServiceTests()
     {
         _pagamentoRepoMock = new Mock<IPagamentoRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _eventPublisherMock = new Mock<IEventPublisher>();
+        _eventPublisherMock = new Mock<IPublishEndpoint>();
 
         _pagamentoRepoMock
             .Setup(r => r.UnitOfWork)
@@ -44,7 +43,6 @@ public class PagamentoServiceTests
         return new PagamentoRequest
         {
             JogoId = Guid.NewGuid(),
-            PedidoId = Guid.NewGuid(),
             UsuarioId = Guid.NewGuid(),
             Valor = 100
         };
@@ -54,7 +52,6 @@ public class PagamentoServiceTests
     {
         return new OrderPlacedEvent
         {
-            OrderId = Guid.NewGuid(),
             GameId = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
             Price = 100
@@ -64,7 +61,6 @@ public class PagamentoServiceTests
     private PagamentoEntity CriarPagamentoValido()
     {
         return new PagamentoEntity(
-                Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 100);
@@ -94,11 +90,11 @@ public class PagamentoServiceTests
         _pagamentoRepoMock.Verify(r => r.Adicionar(It.IsAny<PagamentoEntity>()), Times.AtLeastOnce);
         _pagamentoRepoMock.Verify(r => r.UnitOfWork.Commit(), Times.AtLeastOnce);
 
-        _eventPublisherMock.Verify(p => p.PublishAsync(
+        _eventPublisherMock.Verify(p => p.Publish(
                 It.Is<PaymentProcessedEvent>(msg =>
                     msg.PaymentStatus == PagamentoStatus.Pago.ToString() &&
-                    msg.PaymentId != Guid.Empty),
-                "payment-processed"),
+                    msg.PaymentId != Guid.Empty)
+                ),
                 Times.Once);
     }
 
