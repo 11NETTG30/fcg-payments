@@ -2,6 +2,7 @@ using API.Configurations;
 using Application.DependencyInjection;
 using DotNetEnv;
 using Infrastructure.DependencyInjection;
+using Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDocumentation();
 }
+
+app.UseMigrations();
 
 //app.UseHttpsRedirection();
 

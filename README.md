@@ -91,7 +91,7 @@ docker login ghcr.io -u NOMEUSUARIO
 docker push ghcr.io/11nettg30/payment-api:latest
 ```
 
-### 4. Aplicar Migrations
+### 4. Aplicar Migrations manualmente
 
 No console do Gerenciador de Pacotes, selecione o projeto padrão (ex: `Infrastructure`) e execute os comandos:
 

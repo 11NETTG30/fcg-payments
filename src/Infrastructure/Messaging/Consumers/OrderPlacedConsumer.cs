@@ -35,6 +35,7 @@ public class OrderPlacedConsumer : IConsumer<OrderPlacedEvent>
         }
         catch (DbUpdateException)
         {
+            _logger.LogInformation("Mensagem com dados duplicados, será ignorada");
             return; // já processado
         }
         catch (Exception ex)
