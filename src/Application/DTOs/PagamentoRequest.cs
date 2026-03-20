@@ -1,4 +1,4 @@
-﻿using Application.Events;
+﻿using FCG.Shared.Contracts.Events;
 
 namespace Application.DTOs;
 

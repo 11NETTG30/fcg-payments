@@ -1,6 +1,6 @@
 ﻿using Application.DTOs;
-using Application.Events;
 using Domain.Entities;
+using FCG.Shared.Contracts.Events;
 
 namespace Application.Interfaces.Services;
 

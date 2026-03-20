@@ -1,10 +1,10 @@
-﻿using Application.DTOs;
-using Application.Events;
+using Application.DTOs;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Repositories;
+using FCG.Shared.Contracts.Events;
 using MassTransit;
 using Moq;
 
@@ -50,12 +50,12 @@ public class PagamentoServiceTests
 
     private static OrderPlacedEvent CriarPagamentoEvent()
     {
-        return new OrderPlacedEvent
-        {
-            GameId = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Price = 100
-        };
+        return new OrderPlacedEvent(
+            GameId: Guid.NewGuid(),
+            UserId: Guid.NewGuid(),
+            Price: 100,
+            Email: "usuario@teste.com"
+        );
     }
 
     private PagamentoEntity CriarPagamentoValido()
@@ -92,7 +92,7 @@ public class PagamentoServiceTests
 
         _eventPublisherMock.Verify(p => p.Publish(
                 It.Is<PaymentProcessedEvent>(msg =>
-                    msg.PaymentStatus == PagamentoStatus.Pago.ToString() &&
+                    msg.Status == PagamentoStatus.Pago.ToString() &&
                     msg.PaymentId != Guid.Empty)
                 ),
                 Times.Once);

@@ -1,10 +1,10 @@
-﻿using Application.DTOs;
-using Application.Events;
+using Application.DTOs;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Repositories;
+using FCG.Shared.Contracts.Events;
 using MassTransit;
 
 namespace Application.Services;
@@ -56,7 +56,7 @@ public class PagamentoService : IPagamentoService
         if (pagamento is null)
             pagamento = await GerarPagamento((PagamentoRequest)dadosPagamento);
 
-        await EnviarMensagemFila(pagamento);
+        await EnviarMensagemFila(pagamento, dadosPagamento);
     }
 
     private async Task<PagamentoEntity?> BuscarPagamentoDuplicadoOrderPlaced(OrderPlacedEvent dadosPagamento)
@@ -134,14 +134,17 @@ public class PagamentoService : IPagamentoService
         await _pagamentoRepository.UnitOfWork.Commit();
     }
 
-    private async Task EnviarMensagemFila(PagamentoEntity pagamento)
+    private async Task EnviarMensagemFila(PagamentoEntity pagamento, OrderPlacedEvent evento)
     {
-        var message = new PaymentProcessedEvent
-        {
-            OrderId = pagamento.PedidoId,
-            PaymentId = pagamento.Id,
-            PaymentStatus = pagamento.Status.ToString()
-        };
+        var message = new PaymentProcessedEvent(
+            OrderId: pagamento.PedidoId,
+            PaymentId: pagamento.Id,
+            UserId: evento.UserId,
+            GameId: evento.GameId,
+            Price: evento.Price,
+            Email: evento.Email,
+            Status: pagamento.Status.ToString()
+        );
 
         await _publishEndpoint.Publish(message);
     }

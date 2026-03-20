@@ -1,4 +1,4 @@
-﻿using Application.Events;
+﻿using FCG.Shared.Contracts.Events;
 using Application.Interfaces.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using MassTransit;
