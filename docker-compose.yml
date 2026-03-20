@@ -36,9 +36,10 @@ services:
       retries: 10
 
   payment-api:
-    build:
-      context: ./src
-      dockerfile: API/Dockerfile
+    # build:
+    #   context: ./src
+    #   dockerfile: API/Dockerfile
+    image: ghcr.io/11nettg30/fcg-payments-api:latest
     container_name: payment-api
     networks:
       - fcg-network

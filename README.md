@@ -15,9 +15,7 @@ O objetivo do projeto é a construção de uma **plataforma de games educacionai
 Os principais objetivos deste projeto são:
 
 - Desenvolver um **Microsserviço** para pagamento dos jogos de uma plataforma de games
-- Persistir dados utilizando **Entity Framework Core**
-- Documentar a API com **Swagger**
-- Implementar **testes unitários**
+- Implementar comunicação entre os microsserviços por **Mensageria**
 
 ---
 
@@ -125,5 +123,5 @@ Acesse: https://localhost:7058/swagger
 }
 ```
 
-## Para acessra página do RabbitMq:
+## Para acessar a página do RabbitMq:
 Acesse: http://localhost:15672/

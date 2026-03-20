@@ -55,7 +55,8 @@ public static class DocumentationConfiguration
                 Title = "FCG - Serviço de Pagamentos",
                 Version = "v1",
                 Description = """
-                    API Backend para pagamentos da plataforma de jogos desenvolvida como projeto de pós-graduação em Arquitetura de Sistemas .NET.
+                    API Backend para TESTE dos pagamentos da plataforma de jogos desenvolvida como projeto de pós-graduação em Arquitetura de Sistemas .NET.
+                    Estas APIs são apenas para testes durante o desenvolvimento, pois as comunicações são todas feitas por mensageria.
                     """,
                 Contact = new OpenApiContact
                 {
