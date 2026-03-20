@@ -1,6 +1,7 @@
 using API.Configurations;
 using Application.DependencyInjection;
 using DotNetEnv;
+using FCG.Shared.Infrastructure.Configurations;
 using Infrastructure.DependencyInjection;
 using Infrastructure.Persistence;
 
@@ -14,8 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddDocumentation();
 builder.Services.AddDb(builder.Configuration);
 builder.Services.AddDI(builder.Configuration);
-builder.Services.AddTelemetry(builder);
-builder.Services.AddLogsTelemetry(builder);
+builder.AddObservabilidade();
 
 builder.Services
     .AddApplication()
