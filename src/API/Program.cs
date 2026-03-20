@@ -29,7 +29,7 @@ if (app.Environment.IsDevelopment())
     app.UseDocumentation();
 }
 
-app.UseMigrations();
+await app.UseMigrationsAsync();
 
 //app.UseHttpsRedirection();
 
