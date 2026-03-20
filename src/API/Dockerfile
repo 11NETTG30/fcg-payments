@@ -13,6 +13,8 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
+COPY nuget.config .
+
 # copiar csproj de todos os projetos
 COPY API/API.csproj API/
 COPY Application/Application.csproj Application/
@@ -20,7 +22,9 @@ COPY Domain/Domain.csproj Domain/
 COPY Infrastructure/Infrastructure.csproj Infrastructure/
 
 # restore
-RUN dotnet restore API/API.csproj
+RUN --mount=type=secret,id=nuget_token \
+    NUGET_AUTH_TOKEN=$(cat /run/secrets/nuget_token) \
+    dotnet restore API/API.csproj
 #COPY . .
 COPY API/ API/
 COPY Application/ Application/
