@@ -92,7 +92,7 @@ public class PagamentoServiceTests
 
         _eventPublisherMock.Verify(p => p.Publish(
                 It.Is<PaymentProcessedEvent>(msg =>
-                    msg.Status == PagamentoStatus.Pago.ToString() &&
+                    msg.Status == PagamentoStatus.Approved.ToString() &&
                     msg.PaymentId != Guid.Empty)
                 ),
                 Times.Once);

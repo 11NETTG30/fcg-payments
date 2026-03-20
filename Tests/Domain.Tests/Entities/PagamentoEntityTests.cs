@@ -19,7 +19,7 @@ public class PagamentoEntityTests
     {
         var pagamento = CriarPagamentoValido();
 
-        Assert.Equal(PagamentoStatus.Criado, pagamento.Status);
+        Assert.Equal(PagamentoStatus.Created, pagamento.Status);
         Assert.NotEqual(Guid.Empty, pagamento.Id);
     }
 
@@ -30,7 +30,7 @@ public class PagamentoEntityTests
 
         pagamento.RecusarPagamento();
 
-        Assert.Equal(PagamentoStatus.PagamentoRecusado, pagamento.Status);
+        Assert.Equal(PagamentoStatus.Rejected, pagamento.Status);
     }
 
     [Fact]

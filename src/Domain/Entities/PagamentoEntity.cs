@@ -24,7 +24,7 @@ namespace Domain.Entities
             UsuarioId = usuarioId;
             JogoId = jogoId;
             DataCriacao = DateTime.UtcNow;
-            Status = PagamentoStatus.Criado;
+            Status = PagamentoStatus.Created;
             Valor = valor;
         }
 
@@ -41,7 +41,7 @@ namespace Domain.Entities
             ValidarPodePagar();
 
             DataPagamento = DateTime.UtcNow;
-            Status = PagamentoStatus.Pago;
+            Status = PagamentoStatus.Approved;
         }
 
         public void RecusarPagamento()
@@ -49,14 +49,14 @@ namespace Domain.Entities
             ValidaSeStatusDiferenteCriado("Pagamento não pode ser recusado neste estado.");
 
             DataPagamento = DateTime.UtcNow;
-            Status = PagamentoStatus.PagamentoRecusado;
+            Status = PagamentoStatus.Rejected;
         }
 
         public void Cancelar()
         {
             ChecaPedidoJaPago();
 
-            Status = PagamentoStatus.Cancelado;
+            Status = PagamentoStatus.Cancelled;
         }
 
         #endregion
@@ -64,19 +64,19 @@ namespace Domain.Entities
         #region Validacoes
         private void ChecaPedidoJaPago()
         {
-            if (Status == PagamentoStatus.Pago)
+            if (Status == PagamentoStatus.Approved)
                 throw new PagamentoJaPagoException();
         }
 
         private void ValidaSeStatusDiferenteCriado(string msg)
         {
-            if (Status != PagamentoStatus.Criado)
+            if (Status != PagamentoStatus.Created)
                 throw new DomainException(msg);
         }
 
         private void ValidarPodePagar()
         {
-            if (Status == PagamentoStatus.Cancelado)
+            if (Status == PagamentoStatus.Cancelled)
                 throw new PagamentoCanceladoException();
 
             ChecaPedidoJaPago();
@@ -94,8 +94,8 @@ namespace Domain.Entities
             return new Guid(hash);
         }
 
-        public bool EstaPago() => Status == PagamentoStatus.Pago;
+        public bool EstaPago() => Status == PagamentoStatus.Approved;
 
-        public bool PodeSerAlterado() => Status == PagamentoStatus.Criado;
+        public bool PodeSerAlterado() => Status == PagamentoStatus.Created;
     }
 }

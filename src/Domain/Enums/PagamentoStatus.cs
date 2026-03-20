@@ -2,8 +2,8 @@
 
 public enum PagamentoStatus
 {
-    Criado = 1,
-    Pago,
-    PagamentoRecusado,
-    Cancelado
+    Created = 1,
+    Approved,
+    Rejected,
+    Cancelled
 }

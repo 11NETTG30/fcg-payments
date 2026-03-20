@@ -43,7 +43,7 @@ public class PagamentoService : IPagamentoService
 
         var pagamento = await GerarPagamento(dadosPagamento);
 
-        if (pagamento.Status != PagamentoStatus.Pago)
+        if (pagamento.Status != PagamentoStatus.Approved)
             throw new PagamentoRecusadoException(pagamento.Id);
 
         return pagamento;
@@ -100,7 +100,7 @@ public class PagamentoService : IPagamentoService
 
         var pagamentoExistente = await _pagamentoRepository.ObterPorPedidoAsync(pagamento.PedidoId);
 
-        if (pagamentoExistente is not null && pagamentoExistente.Status == PagamentoStatus.Pago)
+        if (pagamentoExistente is not null && pagamentoExistente.Status == PagamentoStatus.Approved)
             throw new PagamentoJaPagoException();
     }
 
