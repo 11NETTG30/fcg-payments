@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Interfaces.Repositories;
 using Domain.Repositories;
 using Infrastructure.Messaging.Consumers;
+using Infrastructure.Messaging.Setup;
 using Infrastructure.Persistence.Repositories;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +32,8 @@ public static class InfraDependencyInjection
 
             x.UsingRabbitMq((context, cfg) =>
             {
+                cfg.MessageTopology.SetEntityNameFormatter(new CustomNameEntityNameFormatter());
+
                 cfg.Host(
                     configuration["RABBITMQ_HOST"],
                     "/",
