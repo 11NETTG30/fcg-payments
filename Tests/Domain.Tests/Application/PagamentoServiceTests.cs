@@ -6,6 +6,7 @@ using Domain.Enums;
 using Domain.Repositories;
 using FCG.Shared.Contracts.Events;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Tests.Domain.Tests.Application;
@@ -15,6 +16,7 @@ public class PagamentoServiceTests
     private readonly Mock<IPagamentoRepository> _pagamentoRepoMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IPublishEndpoint> _eventPublisherMock;
+    private readonly Mock<ILogger<PagamentoService>> _loggerMock;
     private readonly PagamentoService _service;
 
     public PagamentoServiceTests()
@@ -22,6 +24,7 @@ public class PagamentoServiceTests
         _pagamentoRepoMock = new Mock<IPagamentoRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _eventPublisherMock = new Mock<IPublishEndpoint>();
+        _loggerMock = new Mock<ILogger<PagamentoService>>();
 
         _pagamentoRepoMock
             .Setup(r => r.UnitOfWork)
@@ -33,7 +36,8 @@ public class PagamentoServiceTests
 
         _service = new PagamentoService(
             _pagamentoRepoMock.Object,
-            _eventPublisherMock.Object
+            _eventPublisherMock.Object,
+            _loggerMock.Object
         );
 
     }
