@@ -1,3 +1,4 @@
+using Application.Configuration;
 using Application.DTOs;
 using Application.Interfaces.Services;
 using Domain.Entities;
@@ -7,6 +8,7 @@ using Domain.Repositories;
 using FCG.Shared.Contracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Application.Services;
 
@@ -16,15 +18,20 @@ public class PagamentoService : IPagamentoService
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ILogger<PagamentoService> _logger;
 
+    private readonly double _taxaReprovacao;
+
     public PagamentoService(
         IPagamentoRepository pagamentoRepository,
         IPublishEndpoint publishEndpoint,
-        ILogger<PagamentoService> logger
+        ILogger<PagamentoService> logger,
+        IOptions<PagamentoOptions> options
         )
     {
         _pagamentoRepository = pagamentoRepository;
         _publishEndpoint = publishEndpoint;
         _logger = logger;
+
+        _taxaReprovacao = options.Value.TaxaReprovacao;
     }
 
     public async Task<List<PagamentoDto>> ListarPagamentosPorUsuarioAsync(Guid idUsuario)
@@ -129,7 +136,8 @@ public class PagamentoService : IPagamentoService
     private async Task<bool> ProcessarPagamento()
     {
         await Task.Delay(TimeSpan.FromSeconds(5));
-        return true;
+
+        return Random.Shared.NextDouble() >= _taxaReprovacao;
     }
 
     private async Task SalvarPagamento(PagamentoEntity pagamento, bool pago)

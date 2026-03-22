@@ -1,4 +1,5 @@
 using API.Configurations;
+using Application.Configuration;
 using Application.DependencyInjection;
 using DotNetEnv;
 using FCG.Shared.Infrastructure.Configurations;
@@ -20,6 +21,10 @@ builder.AddObservabilidade();
 builder.Services
     .AddApplication()
     .AddFluentValidationConfig();
+
+builder.Services.Configure<PagamentoOptions>(
+    builder.Configuration.GetSection(PagamentoOptions.SectionName)
+);
 
 var app = builder.Build();
 

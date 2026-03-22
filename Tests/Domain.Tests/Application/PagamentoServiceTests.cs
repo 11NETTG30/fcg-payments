@@ -1,12 +1,14 @@
+using Application.Configuration;
 using Application.DTOs;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Entities;
-using Domain.Enums;
+using Domain.Exceptions;
 using Domain.Repositories;
 using FCG.Shared.Contracts.Events;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Tests.Domain.Tests.Application;
@@ -17,7 +19,7 @@ public class PagamentoServiceTests
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IPublishEndpoint> _eventPublisherMock;
     private readonly Mock<ILogger<PagamentoService>> _loggerMock;
-    private readonly PagamentoService _service;
+    private readonly Mock<IOptions<PagamentoOptions>> _pagamentoOptionsMock;
 
     public PagamentoServiceTests()
     {
@@ -25,6 +27,7 @@ public class PagamentoServiceTests
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _eventPublisherMock = new Mock<IPublishEndpoint>();
         _loggerMock = new Mock<ILogger<PagamentoService>>();
+        _pagamentoOptionsMock = new Mock<IOptions<PagamentoOptions>>();
 
         _pagamentoRepoMock
             .Setup(r => r.UnitOfWork)
@@ -33,13 +36,6 @@ public class PagamentoServiceTests
         _unitOfWorkMock
             .Setup(u => u.Commit())
             .ReturnsAsync(true);
-
-        _service = new PagamentoService(
-            _pagamentoRepoMock.Object,
-            _eventPublisherMock.Object,
-            _loggerMock.Object
-        );
-
     }
 
     private static PagamentoRequest CriarPagamentoRequest()
@@ -70,25 +66,52 @@ public class PagamentoServiceTests
                 100);
     }
 
-    [Fact]
-    public async Task Deve_criar_pagamento_e_salvar_no_repositorio()
+    private PagamentoService CriarService(double taxaReprovacao)
     {
+        _pagamentoOptionsMock
+            .Setup(o => o.Value)
+            .Returns(new PagamentoOptions { TaxaReprovacao = taxaReprovacao });
+
+        return new PagamentoService(
+            _pagamentoRepoMock.Object,
+            _eventPublisherMock.Object,
+            _loggerMock.Object,
+            _pagamentoOptionsMock.Object
+        );
+    }
+
+    [Fact]
+    public async Task Deve_criar_pagamento_e_salvar_no_repositorio_quando_aprovado()
+    {
+        var service = CriarService(taxaReprovacao: 0.0);
         var pagamento = CriarPagamentoRequest();
 
-        await _service.ProcessarAsync(pagamento);
+        await service.ProcessarAsync(pagamento);
 
         _pagamentoRepoMock.Verify(r => r.Adicionar(It.IsAny<PagamentoEntity>()), Times.AtLeastOnce);
         _pagamentoRepoMock.Verify(r => r.UnitOfWork.Commit(), Times.AtLeastOnce);
     }
 
     [Fact]
+    public async Task Deve_lancar_exception_quando_pagamento_reprovado()
+    {
+        var service = CriarService(taxaReprovacao: 1);
+        var pagamento = CriarPagamentoRequest();
+
+        await Assert.ThrowsAsync<PagamentoRecusadoException>(
+            () => service.ProcessarAsync(pagamento)
+        );
+    }
+
+    [Fact]
     public async Task Deve_criar_pagamento_e_publicar_mensagem()
     {
         // Arrange
+        var service = CriarService(taxaReprovacao: 0);
         var pagamento = CriarPagamentoEvent();
 
         // Act
-        await _service.ProcessarAsync(pagamento);
+        await service.ProcessarAsync(pagamento);
 
         // Assert
         _pagamentoRepoMock.Verify(r => r.Adicionar(It.IsAny<PagamentoEntity>()), Times.AtLeastOnce);
@@ -96,7 +119,10 @@ public class PagamentoServiceTests
 
         _eventPublisherMock.Verify(p => p.Publish(
                 It.Is<PaymentProcessedEvent>(msg =>
-                    msg.Status == PagamentoStatus.Approved.ToString() &&
+                    msg.GameId == pagamento.GameId &&
+                    msg.UserId == pagamento.UserId &&
+                    msg.Email == pagamento.Email &&
+                    msg.Price == pagamento.Price &&
                     msg.PaymentId != Guid.Empty)
                 ),
                 Times.Once);
@@ -106,6 +132,7 @@ public class PagamentoServiceTests
     public async Task Deve_buscar_pagamento_por_id()
     {
         // Arrange
+        var service = CriarService(taxaReprovacao: 0.0);
         var pagamento = CriarPagamentoValido();
 
         _pagamentoRepoMock
@@ -113,7 +140,7 @@ public class PagamentoServiceTests
             .ReturnsAsync(pagamento);
 
         // Act
-        var resultado = await _service.ObterPagamentoAsync(pagamento.Id);
+        var resultado = await service.ObterPagamentoAsync(pagamento.Id);
 
         // Assert
         Assert.NotNull(resultado);
