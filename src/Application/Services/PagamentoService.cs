@@ -82,7 +82,7 @@ public class PagamentoService : IPagamentoService
     {
         var pagamento = await CriarPagamento(dadosPagamento);
 
-        var pago = ProcessarPagamento();
+        var pago = await ProcessarPagamento();
 
         await SalvarPagamento(pagamento, pago);
 
@@ -126,8 +126,9 @@ public class PagamentoService : IPagamentoService
         return pagamento;
     }
 
-    private bool ProcessarPagamento()
+    private async Task<bool> ProcessarPagamento()
     {
+        await Task.Delay(TimeSpan.FromSeconds(5));
         return true;
     }
 
