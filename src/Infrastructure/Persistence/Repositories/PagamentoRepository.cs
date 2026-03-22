@@ -52,6 +52,7 @@ public class PagamentoRepository : IPagamentoRepository
     {
         var dado = await _context.Pagamentos
             .Where(p => p.PedidoId == idPedido)
+            .OrderByDescending(p => p.DataCriacao)
             .FirstOrDefaultAsync();
 
         return dado;

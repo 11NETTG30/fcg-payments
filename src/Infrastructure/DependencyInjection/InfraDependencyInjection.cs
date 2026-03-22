@@ -1,5 +1,4 @@
-﻿using Application.Interfaces.Interfaces.Repositories;
-using Domain.Repositories;
+﻿using Domain.Repositories;
 using Infrastructure.Messaging.Consumers;
 using Infrastructure.Messaging.Setup;
 using Infrastructure.Persistence.Repositories;
@@ -17,7 +16,6 @@ public static class InfraDependencyInjection
     {
         #region Repository
         services.AddScoped<IPagamentoRepository, PagamentoRepository>();
-        services.AddScoped<IProcessedEventRepository, ProcessedEventRepository>();
         #endregion
 
         #region Messageria

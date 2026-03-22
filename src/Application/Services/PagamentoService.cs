@@ -64,10 +64,15 @@ public class PagamentoService : IPagamentoService
     {
         _logger.LogInformation("Iniciando processamento do pagamento, usuário: {Usuario}, jogo: {Jogo}, valor: {Valor}", dadosPagamento.UserId, dadosPagamento.GameId, dadosPagamento.Price);
 
-        var pagamento = await BuscarPagamentoDuplicadoOrderPlaced(dadosPagamento);
+        var pagamentoExistente = await BuscarPagamentoDuplicadoOrderPlaced(dadosPagamento);
 
-        if (pagamento is null)
-            pagamento = await GerarPagamento((PagamentoRequest)dadosPagamento);
+        if (pagamentoExistente is not null && pagamentoExistente.Status is PagamentoStatus.Approved or PagamentoStatus.Created)
+        {
+            _logger.LogInformation("Pagamento já existente com status {Status} ({PagamentoId}), ignorando mensagem duplicada", pagamentoExistente.Status, pagamentoExistente.Id);
+            return;
+        }
+
+        var pagamento = await GerarPagamento((PagamentoRequest)dadosPagamento);
 
         _logger.LogInformation("Status do pagamento: {Status}", pagamento.Status.ToString());
 

@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
-using Infrastructure.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -13,7 +12,6 @@ public class PagamentoDbContext : DbContext, IUnitOfWork
     }
 
     public DbSet<PagamentoEntity> Pagamentos { get; set; }
-    public DbSet<ProcessedEventEntity> ProcessedEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
