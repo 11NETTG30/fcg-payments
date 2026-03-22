@@ -29,9 +29,13 @@ public class OrderPlacedConsumer : IConsumer<OrderPlacedEvent>
         {
             var message = context.Message;
 
+            _logger.LogInformation("Mensagem recebida: {Message}", message);
+
             await _repository.SaveAsync(message.UserId, message.GameId);
 
             await _pagamentoService.ProcessarAsync(message);
+
+            _logger.LogInformation("Mensagem Processada.");
         }
         catch (DbUpdateException)
         {

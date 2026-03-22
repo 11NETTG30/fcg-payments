@@ -6,6 +6,7 @@ using Domain.Exceptions;
 using Domain.Repositories;
 using FCG.Shared.Contracts.Events;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -13,14 +14,17 @@ public class PagamentoService : IPagamentoService
 {
     private readonly IPagamentoRepository _pagamentoRepository;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly ILogger<PagamentoService> _logger;
 
     public PagamentoService(
         IPagamentoRepository pagamentoRepository,
-        IPublishEndpoint publishEndpoint
+        IPublishEndpoint publishEndpoint,
+        ILogger<PagamentoService> logger
         )
     {
         _pagamentoRepository = pagamentoRepository;
         _publishEndpoint = publishEndpoint;
+        _logger = logger;
     }
 
     public async Task<List<PagamentoDto>> ListarPagamentosPorUsuarioAsync(Guid idUsuario)
@@ -51,10 +55,14 @@ public class PagamentoService : IPagamentoService
 
     public async Task ProcessarAsync(OrderPlacedEvent dadosPagamento)
     {
+        _logger.LogInformation("Iniciando processamento do pagamento, usuário: {Usuario}, jogo: {Jogo}, valor: {Valor}", dadosPagamento.UserId, dadosPagamento.GameId, dadosPagamento.Price);
+
         var pagamento = await BuscarPagamentoDuplicadoOrderPlaced(dadosPagamento);
 
         if (pagamento is null)
             pagamento = await GerarPagamento((PagamentoRequest)dadosPagamento);
+
+        _logger.LogInformation("Status do pagamento: {Status}", pagamento.Status.ToString());
 
         await EnviarMensagemFila(pagamento, dadosPagamento);
     }
@@ -145,6 +153,8 @@ public class PagamentoService : IPagamentoService
             Email: evento.Email,
             Status: pagamento.Status.ToString()
         );
+
+        _logger.LogInformation("Enviando mensagem de PaymentProcessedEvent do pagamento: {PaymentId}", pagamento.Id);
 
         await _publishEndpoint.Publish(message);
     }
