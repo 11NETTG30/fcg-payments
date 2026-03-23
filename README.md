@@ -33,6 +33,24 @@ Os principais objetivos deste projeto são:
 | Monitoramento            | New Relic (OpenTelemetry)                                           |
 | Testes Unitários         | xUnit                                                               |
 
+---
+
+## 📡 Comunicação por Eventos
+
+Este microsserviço participa do fluxo de compra utilizando mensageria (RabbitMQ).
+
+### Eventos consumidos
+
+- OrderPlacedEvent
+  Quando consumido, o microsserviço processa o pagamento da compra de um jogo.
+
+### Eventos publicados
+
+- PaymentProcessedEvent
+  Disparado ao finalizar o processamento do pagamento da compra de um jogo.
+
+---
+
 ## 🚀 Setup Inicial
 
 ### 1. Configurar Variáveis de Ambiente do docker-compose
@@ -111,7 +129,7 @@ docker-compose up -d
 Update-Database
 ```
 
-Rodar a API
+## Execução da API
 
 Acesse: https://localhost:7058/swagger
 
