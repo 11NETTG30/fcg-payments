@@ -24,8 +24,8 @@ jobs:
       - name: Build e push da imagem
         uses: docker/build-push-action@v5
         with:
-          context: ./src
-          file: ./src/API/Dockerfile
+          context: .
+          file: Dockerfile
           push: true
           tags: ghcr.io/11nettg30/fcg-payments-api:latest
           secrets: |

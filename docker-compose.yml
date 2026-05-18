@@ -3,9 +3,9 @@ services:
     image: postgres:18.1
     container_name: fcg-postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${Postgres_User}
+      POSTGRES_PASSWORD: ${Postgres_Password}
+      POSTGRES_DB: ${Postgres_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -13,7 +13,7 @@ services:
     networks:
       - fcg-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${Postgres_User} -d ${Postgres_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,8 +25,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_DEFAULT_USER: ${RabbitMQ__Username}
+      RABBITMQ_DEFAULT_PASS: ${RabbitMQ__Password}
     networks:
       - fcg-network
     healthcheck:
@@ -36,15 +36,17 @@ services:
       retries: 10
 
   payment-api:
-    # build:
-    #   context: ./src
-    #   dockerfile: API/Dockerfile
-    image: ghcr.io/11nettg30/fcg-payments-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      secrets:
+        - nuget_token
+    # image: ghcr.io/11nettg30/fcg-payments-api:latest
     container_name: payment-api
     networks:
       - fcg-network
     env_file: 
-      - src/API/.env
+      - .env
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -61,3 +63,7 @@ volumes:
 networks:
   fcg-network:
     driver: bridge
+
+secrets:
+  nuget_token:
+    file: ./nuget_token.txt

@@ -11,31 +11,32 @@ USER app
 # Esta fase é usada para compilar o projeto de serviço
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
+WORKDIR /
 
 COPY nuget.config .
 
 # copiar csproj de todos os projetos
-COPY API/API.csproj API/
-COPY Application/Application.csproj Application/
-COPY Domain/Domain.csproj Domain/
-COPY Infrastructure/Infrastructure.csproj Infrastructure/
+COPY src/FCG.Payments.API/API.csproj src/FCG.Payments.API/
+COPY src/FCG.Payments.Application/Application.csproj src/FCG.Payments.Application/
+COPY src/FCG.Payments.Domain/Domain.csproj src/FCG.Payments.Domain/
+COPY src/FCG.Payments.Infrastructure/Infrastructure.csproj src/FCG.Payments.Infrastructure/
 
 # restore
 RUN --mount=type=secret,id=nuget_token \
     NUGET_AUTH_TOKEN=$(cat /run/secrets/nuget_token) \
-    dotnet restore API/API.csproj
+    dotnet restore src/FCG.Payments.API/API.csproj
 #COPY . .
-COPY API/ API/
-COPY Application/ Application/
-COPY Domain/ Domain/
-COPY Infrastructure/ Infrastructure/
+COPY src/FCG.Payments.API/ src/FCG.Payments.API/
+COPY src/FCG.Payments.Application/ src/FCG.Payments.Application/
+COPY src/FCG.Payments.Domain/ src/FCG.Payments.Domain/
+COPY src/FCG.Payments.Infrastructure/ src/FCG.Payments.Infrastructure/
 
-WORKDIR /src/API
-RUN dotnet build ./API.csproj -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR /src/FCG.Payments.API
+RUN dotnet build API.csproj -c $BUILD_CONFIGURATION -o /app/build
 
 # Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
 FROM build AS publish
+WORKDIR /src/FCG.Payments.API
 RUN dotnet publish API.csproj \
     -c $BUILD_CONFIGURATION \
     -o /app/publish \

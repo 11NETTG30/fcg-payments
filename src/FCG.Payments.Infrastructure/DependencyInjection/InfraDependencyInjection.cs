@@ -19,9 +19,15 @@ public static class InfraDependencyInjection
         #endregion
 
         #region Messageria
-        if (string.IsNullOrWhiteSpace(configuration["RABBITMQ_HOST"]) || 
-            string.IsNullOrWhiteSpace(configuration["RABBITMQ_USER"]) || 
-            string.IsNullOrWhiteSpace(configuration["RABBITMQ_PASSWORD"]))
+        services.Configure<RabbitMqSettings>(configuration.GetSection("RabbitMQ"));
+
+        var rabbit = configuration
+                .GetSection("RabbitMQ")
+                .Get<RabbitMqSettings>()!;
+
+        if (string.IsNullOrWhiteSpace(rabbit.Host) || 
+            string.IsNullOrWhiteSpace(rabbit.Username) || 
+            string.IsNullOrWhiteSpace(rabbit.Password))
             throw new Exception("Configuração do RabbitMQ faltando.");
 
         services.AddMassTransit(x =>
@@ -33,12 +39,12 @@ public static class InfraDependencyInjection
                 cfg.MessageTopology.SetEntityNameFormatter(new CustomNameEntityNameFormatter());
 
                 cfg.Host(
-                    configuration["RABBITMQ_HOST"],
-                    "/",
+                    rabbit.Host,
+                    rabbit.VirtualHost,
                     h =>
                     {
-                        h.Username(configuration["RABBITMQ_USER"]!);
-                        h.Password(configuration["RABBITMQ_PASSWORD"]!);
+                        h.Username(rabbit.Username);
+                        h.Password(rabbit.Password);
                     });
 
                 cfg.ConfigureEndpoints(context);

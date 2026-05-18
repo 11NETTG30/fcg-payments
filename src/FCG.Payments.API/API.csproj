@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
-    <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\FCG.Payments.Application\Application.csproj" />
+    <ProjectReference Include="..\FCG.Payments.Domain\Domain.csproj" />
+    <ProjectReference Include="..\FCG.Payments.Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

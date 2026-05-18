@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Application\Application.csproj" />
-    <ProjectReference Include="..\src\Domain\Domain.csproj" />
+    <ProjectReference Include="..\src\FCG.Payments.Application\Application.csproj" />
+    <ProjectReference Include="..\src\FCG.Payments.Domain\Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
