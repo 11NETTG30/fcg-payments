@@ -1,4 +1,4 @@
-name: Publicar Imagem Docker
+name: Publicar Imagem Docker na Azure
 
 on:
   workflow_dispatch:
@@ -29,4 +29,4 @@ jobs:
             acrfcg.azurecr.io/fcg-payments-api:latest
             acrfcg.azurecr.io/fcg-payments-api:${{ github.sha }}
           secrets: |
-            nuget_token=${{ secrets.GITHUB_TOKEN }}
+            nuget_token=${{ secrets.NUGET_AUTH_TOKEN }}
