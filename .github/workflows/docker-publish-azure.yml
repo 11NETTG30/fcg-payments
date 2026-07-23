@@ -1,0 +1,32 @@
+name: Publicar Imagem Docker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login no ACR
+        uses: docker/login-action@v3
+        with:
+          registry: acrfcg.azurecr.io
+          username: ${{ secrets.AZURE_CLIENT_ID }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Build e push da imagem
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            acrfcg.azurecr.io/fcg-payments-api:latest
+            acrfcg.azurecr.io/fcg-payments-api:${{ github.sha }}
+          secrets: |
+            nuget_token=${{ secrets.GITHUB_TOKEN }}
